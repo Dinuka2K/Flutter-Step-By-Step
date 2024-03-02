@@ -1,6 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:zero_to_hero/screens/home_page.dart';
+import 'package:zero_to_hero/screens/onboardScreen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -15,7 +16,7 @@ class SplashScreen extends StatelessWidget {
           Text('Zero to Hero', style: TextStyle(fontSize: 24)),
         ],
       ),
-      nextScreen: HomePage(),
+      nextScreen: OnBoardScreen(),
       splashIconSize: 400,
       backgroundColor: Color.fromARGB(255, 107, 159, 248),
     );
