@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:zero_to_hero/auth/auth_gate.dart';
-import 'package:zero_to_hero/auth/login_or_register.dart';
+import 'package:zero_to_hero/services/auth/auth_gate.dart';
+import 'package:zero_to_hero/services/auth/login_or_register.dart';
 import 'package:zero_to_hero/screens/home_page.dart';
 import 'package:zero_to_hero/screens/introPage1.dart';
 import 'package:zero_to_hero/screens/introPage2.dart';

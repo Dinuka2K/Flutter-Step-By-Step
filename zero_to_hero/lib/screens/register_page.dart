@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zero_to_hero/auth/auth_service.dart';
+import 'package:zero_to_hero/services/auth/auth_service.dart';
 import 'package:zero_to_hero/components/my_button.dart';
 import 'package:zero_to_hero/components/my_textfield.dart';
 
