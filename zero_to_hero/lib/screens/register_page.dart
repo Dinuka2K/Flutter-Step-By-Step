@@ -43,7 +43,7 @@ class RegisterPage extends StatelessWidget {
             //user name textfield
             MyTextField(
               controller: usernameController,
-              hintText: "Enter Username",
+              hintText: "Enter Email Address",
               obscureText: false,
             ),
 
