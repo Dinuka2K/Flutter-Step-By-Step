@@ -2,28 +2,77 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:zero_to_hero/components/chat_bubble.dart';
 import 'package:zero_to_hero/components/my_textfield.dart';
 import 'package:zero_to_hero/services/auth/auth_service.dart';
 import 'package:zero_to_hero/services/auth/chat/chat_services.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   final String receiverEmail;
   final String receiverID;
 
   ChatPage({super.key, required this.receiverEmail, required this.receiverID});
 
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
   //text controller
   final TextEditingController _messageController = TextEditingController();
 
   //chat & auth services
   final ChatService _chatService = ChatService();
+
   final AuthService _authService = AuthService();
+
+  //to text field focus
+  FocusNode myFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    //add listener to focus node
+    myFocusNode.addListener(() {
+      if (myFocusNode.hasFocus) {
+        //casuse a delay so that the keyboard has a time to show up
+        //then Amonut of remianing space will be calculated
+        //then scroll down
+
+        Future.delayed(
+          const Duration(
+            milliseconds: 500,
+          ),
+          () => scrollDown(),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    myFocusNode.dispose();
+    _messageController.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  //scroll controller
+  final ScrollController _scrollController = ScrollController();
+
+  void scrollDown() {
+    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+        duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+  }
 
   void sendMessage() async {
     //if somthing in the textfield
     if (_messageController.text.isNotEmpty) {
       //send the message
-      await _chatService.sendMessage(receiverID, _messageController.text);
+      await _chatService.sendMessage(
+          widget.receiverID, _messageController.text);
 
       //clear the textfield
       _messageController.clear();
@@ -34,7 +83,7 @@ class ChatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(receiverEmail),
+        title: Text(widget.receiverEmail),
       ),
       body: Column(
         children: [
@@ -53,7 +102,7 @@ class ChatPage extends StatelessWidget {
     String senderID = _authService.getCurrentUser()!.uid;
 
     return StreamBuilder(
-        stream: _chatService.getMessages(receiverID, senderID),
+        stream: _chatService.getMessages(widget.receiverID, senderID),
         builder: (context, snapshot) {
           //error
           if (snapshot.hasError) {
@@ -67,6 +116,7 @@ class ChatPage extends StatelessWidget {
 
           //retuen list view
           return ListView(
+            controller: _scrollController,
             children: snapshot.data!.docs
                 .map((doc) => _buildMessageItem(doc))
                 .toList(),
@@ -91,9 +141,7 @@ class ChatPage extends StatelessWidget {
         crossAxisAlignment:
             isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          Text(
-            data["message"],
-          ),
+          ChatBubble(message: data['message'], isCurrentUser: isCurrentUser),
         ],
       ),
     );
@@ -101,23 +149,37 @@ class ChatPage extends StatelessWidget {
 
   //build user input
   Widget _buildUsrInput() {
-    return Row(
-      children: [
-        //text field should take the remaining space
-        Expanded(
-          child: MyTextField(
-            hintText: "Type a message",
-            obscureText: false,
-            controller: _messageController,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 50.0),
+      child: Row(
+        children: [
+          //text field should take the remaining space
+          Expanded(
+            child: MyTextField(
+              hintText: "Type a message",
+              obscureText: false,
+              focusNode: myFocusNode,
+              controller: _messageController,
+            ),
           ),
-        ),
 
-        //send button
-        IconButton(
-          onPressed: sendMessage,
-          icon: Icon(Icons.arrow_upward),
-        ),
-      ],
+          //send button
+          Container(
+            decoration: const BoxDecoration(
+              color: Colors.green,
+              shape: BoxShape.circle,
+            ),
+            margin: const EdgeInsets.only(right: 25),
+            child: IconButton(
+              onPressed: sendMessage,
+              icon: const Icon(
+                Icons.arrow_upward,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
